@@ -26,8 +26,13 @@ out vec4 out_color;
 
 void main() {
   // YOUR CODE HERE
+  float kd = 1;
+  vec4 I = vec4(u_light_intensity, 1.0);
+  float r = length(vec4(u_light_pos, 1.0) - v_position);
+  vec4 l = vec4(u_light_pos, 1.0) - v_position;
   
   // (Placeholder code. You will want to replace it.)
-  out_color = (vec4(1, 1, 1, 0) + v_normal) / 2;
-  out_color.a = 1;
+  // out_color = (vec4(1, 1, 1, 0) + v_normal) / 2;
+  out_color = kd * I/(r*r) * max(0, dot(v_normal, normalize(l)));
+  out_color.a = u_color.a;
 }

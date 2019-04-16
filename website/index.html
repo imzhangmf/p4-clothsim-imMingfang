@@ -23,19 +23,346 @@
 
 <body>
 
-<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2017</h1>
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2019</h1>
 <h1 align="middle">Project 4: Cloth Simulator</h1>
-<h2 align="middle">YOUR NAME, CS184-??</h2>
+<h2 align="middle">Mingfang Zhang</h2>
 
 <br><br>
 
 <div>
 
 <h2 align="middle">Overview</h2>
-<p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+<p>I implemented a real-time simulation of cloth using a mass and spring based system in this project. I built the data structures to discretely represent the cloth, defined and applied physical constraints on them, and applied numerical integration to simulate the way cloth moved over time. I also implemented collisions with other objects as well as self-collisions to prevent cloth clipping. Finally, I implemented Diffuse, Blinn-Phong, Texture Mapping, Bump & Displacement Map, and Mirror shaders.</p>
 
 <h2 align="middle">Part I: Masses and springs</h2>
 
+<h3>1-1, 1-2</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/1-1.png" align="middle" width="100%"/>
+        <figcaption align="middle">scene/pinned2.json</figcaption>
+      </td>
+      <td>
+        <img src="images/1-2.png" align="middle" width="100%"/>
+        <figcaption align="middle">without any shearing constraints</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/1-3.png" align="middle" width="100%"/>
+        <figcaption align="middle">with only shearing constraints</figcaption>
+      </td>
+      <td>
+        <img src="images/1-4.png" align="middle" width="100%"/>
+        <figcaption align="middle">with all constraints</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+
+<h3>2-1</h3>
+
+<p>Changing the spring constant ks:</p>
+
+<p>The smaller the ks is, the easier it is for the cloth to deform. On the contrary, with a big ks, the cloth will be stretched tightly, because of the huge stretch force between masses.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/2-1.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 5</figcaption>
+      </td>
+      <td>
+        <img src="images/2-2.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 50000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>Changing the cloth density:</p>
+
+<p>The bigger the density is, the easier it is for the cloth to deform. On the contrary, with a small ks, the cloth will be stretched tightly, because the stretch force can give the mass much more acceleration than gravity.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/2-3.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 5</figcaption>
+      </td>
+      <td>
+        <img src="images/2-4.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 5000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>Changing the damping:</p>
+
+<p>The smaller the damping is, the faster the cloth moves, like in the air or vacuum. On the contrary, with a big damping number, the cloth will move really slowly, like in the water.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/2-5.png" align="middle" width="100%"/>
+        <figcaption align="middle">damping = 0.1</figcaption>
+      </td>
+      <td>
+        <img src="images/2-6.png" align="middle" width="100%"/>
+        <figcaption align="middle">damping = 0.5</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3>2-2</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/2-7.png" align="middle" width="100%"/>
+        <figcaption align="middle">scene/pinned4.json</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part III: Handling collisions with other objects</h2>
+
+<h3>3-1, 3-2</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/3-1.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 500</figcaption>
+      </td>
+      <td>
+        <img src="images/3-2.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 5000</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/3-3.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 50000</figcaption>
+      </td>
+      <td>
+        <img src="images/3-4.png" align="middle" width="100%"/>
+        <figcaption align="middle">collision with plane</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>The difference is that the bigger the ks is, the stronger the cloth is. With a small ks, the cloth is like silk, but with a big ks, the cloth is like plastic.</p>
+
+<h2 align="middle">Part IV: Handling self-collisions</h2>
+
+<h3>4-1</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/4-1.png" align="middle" width="100%"/>
+        <figcaption align="middle">scene/selfCollision.json</figcaption>
+      </td>
+      <td>
+        <img src="images/4-2.png" align="middle" width="100%"/>
+        <figcaption align="middle">scene/selfCollision.json</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/4-3.png" align="middle" width="100%"/>
+        <figcaption align="middle">scene/selfCollision.json</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3>4-2</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/4-4.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 5</figcaption>
+      </td>
+      <td>
+        <img src="images/4-5.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 5</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/4-6.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 50000</figcaption>
+      </td>
+      <td>
+        <img src="images/4-7.png" align="middle" width="100%"/>
+        <figcaption align="middle">density = 50000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>As density increase, we see more folds when the cloth is falling and when it rests at last. It is more unstable and chaoic when the density is big. On the contrary, with a samll density, the falling cloth is more stable and would lead to less folds in the end.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/4-8.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 5</figcaption>
+      </td>
+      <td>
+        <img src="images/4-9.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 5</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/4-10.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 50000</figcaption>
+      </td>
+      <td>
+        <img src="images/4-11.png" align="middle" width="100%"/>
+        <figcaption align="middle">ks = 50000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>As the ks decrease, we see more folds when the cloth is falling and when it rests at last. It is more unstable and chaoic when the ks is small. On the contrary, with a big ks, the falling cloth is more stable and would lead to less folds in the end.</p>
+
+<h2 align="middle">Part V: Shader</h2>
+
+<h3>5-1</h3>
+
+<p>A vertex shader and fragment shader work together to become a shader program which creates lighting and material effects for a given object. In particular, a vertex shader takes in the information of the triangles in the mesh of the object, like their positions, and calculate the corresponding output position and the supposed output color of each vertex, which serve as input to the fragment shader. And in the fragment shader, each pixel's color in the triangle is calculated.</p>
+
+<h3>5-2</h3>
+
+<p>Blinn-Phong shading combines the shading effects of ambient shading, diffuse shading, and specular shading, and when calculating the Blinn-Phong intensity, we add the intensity of all three shading together.</p>
+
+<p>Lbp = La + Ld + Ls = kaIa + kd(I/r^2)max(0,nl) + ks(I/r^2)max(0,nh)^p</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/5-1.png" align="middle" width="100%"/>
+        <figcaption align="middle">only ambient shading</figcaption>
+      </td>
+      <td>
+        <img src="images/5-2.png" align="middle" width="100%"/>
+        <figcaption align="middle">only diffuse shading</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/5-3.png" align="middle" width="100%"/>
+        <figcaption align="middle">only specular shading</figcaption>
+      </td>
+      <td>
+        <img src="images/5-4.png" align="middle" width="100%"/>
+        <figcaption align="middle">Blinn-Phong shading</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3>5-3</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/5-5.png" align="middle" width="100%"/>
+        <figcaption align="middle">My texture</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3>5-4</h3>
+
+<p>Bumping mapping can cause an illusion of detail (bumps) on an object by modifying the normal vectors of an object in the fragment shader. And displacement mapping modifies the position of vertices to reflect the height map besides bump mapping.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/5-10.png" align="middle" width="100%"/>
+        <figcaption align="middle">Bump mapping with texture 4</figcaption>
+      </td>
+      <td>
+        <img src="images/5-11.png" align="middle" width="100%"/>
+        <figcaption align="middle">Displacement mapping with texture 4</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>In bump mapping, after changing the coarseness, few changes can be seen. But in displacement mapping, we can see the texture shape is more obvious after changing the parameters to <code>-o 128 -a 128</code></p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/5-12.png" align="middle" width="100%"/>
+        <figcaption align="middle">Bump mapping with -o 16 -a 16</figcaption>
+      </td>
+      <td>
+        <img src="images/5-13.png" align="middle" width="100%"/>
+        <figcaption align="middle">Displacement mapping with -o 16 -a 16</figcaption>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/5-14.png" align="middle" width="100%"/>
+        <figcaption align="middle">Bump mapping with -o 128 -a 128</figcaption>
+      </td>
+      <td>
+        <img src="images/5-15.png" align="middle" width="100%"/>
+        <figcaption align="middle">Displacement mapping with -o 128 -a 128</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+
+<h3>5-5</h3>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/5-6.png" align="middle" width="100%"/>
+        <figcaption align="middle">Mirror</figcaption>
+      </td>
+      <td>
+        <img src="images/5-7.png" align="middle" width="100%"/>
+        <figcaption align="middle">Mirror</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
 
 </body>
 </html>
